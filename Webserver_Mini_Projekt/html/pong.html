@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            margin: 0;
+        }
+        canvas {
+            border: 1px solid #fff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let ballX = 50;
+        let ballY = 50;
+        let ballSpeedX = 5;
+        let ballSpeedY = 3;
+
+        const PADDLE_WIDTH = 100;
+        const PADDLE_HEIGHT = 10;
+        let paddleX = (canvas.width / 2) - (PADDLE_WIDTH / 2);
+
+        function update() {
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+
+            if (ballX > canvas.width || ballX < 0) {
+                ballSpeedX = -ballSpeedX;
+            }
+            if (ballY > canvas.height || ballY < 0) {
+                ballSpeedY = -ballSpeedY;
+            }
+
+            if (ballY > canvas.height - PADDLE_HEIGHT &&
+                ballX > paddleX - PADDLE_WIDTH / 2 &&
+                ballX < paddleX + PADDLE_WIDTH / 2) {
+                ballSpeedY = -ballSpeedY;
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, 10, 0, Math.PI * 2, true);
+            ctx.fill();
+
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(paddleX, canvas.height - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT);
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        canvas.addEventListener('mousemove', (e) => {
+            let rect = canvas.getBoundingClientRect();
+            let root = document.documentElement;
+            let mouseX = e.clientX - rect.left - root.scrollLeft;
+            paddleX = mouseX - PADDLE_WIDTH / 2;
+        });
+
+        gameLoop();
+    </script>
+</body>
+</html>
